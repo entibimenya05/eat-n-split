@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const initialFriends = [
   {
     id: 118836,
@@ -18,15 +20,36 @@ const initialFriends = [
     balance: 0,
   },
 ];
+//since we will need this button in many places,let's create one with the children props
+//here the children props is Select
+function Button({ children, onClick }) {
+  return (
+    <button classname="button" onClick={onClick}>
+      {children}
+    </button>
+  );
+}
 export default function App() {
+  //conditionally show addFriend form
+  //1.create a new piece of state
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  function handleShowAddFriend() {
+    //call back function which takes the current input and the new state will be the opposite of that
+    setShowAddFriend((show) => !show);
+  }
   return (
     <div classname="app">
       <div classname="sidebar">
         <FriendsList />
-
-        <FormAddFriend />
+        {/*2. use the piece of state showAddFriend to conditionall show the form using the && operatot*/}
+        {showAddFriend && <FormAddFriend />}
         {/*reusing the Button with Add Friend as children props*/}
-        <Button>Add Friend</Button>
+        {/*3. step when we update the state by clicking on the button to show addFriend, use onClick handler
+        Also istead of showing add friend when it is open, it should show close
+        so conditionally render the text Add Friend*/}
+        <Button onClick={handleShowAddFriend}>
+          {showAddFriend ? "Close" : "Add Friend"}
+        </Button>
       </div>
       <FormSplitBill />
     </div>
@@ -73,11 +96,7 @@ function Friend({ friend }) {
     </li>
   );
 }
-//since we will need this button in many places,let's create one with the children props
-//here the children props is Select
-function Button({ children }) {
-  return <button classname="button">{children}</button>;
-}
+
 //building the forms
 function FormAddFriend() {
   return (
