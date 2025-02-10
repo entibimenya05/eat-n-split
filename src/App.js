@@ -56,6 +56,19 @@ export default function App() {
     //in order not to display the two forms at the same time
     setShowAddFriend(false);
   }
+  function handleSplitBill(value) {
+    // console.log(value);
+    //let's now update our friends state
+    setFriends((friends) =>
+      friends.map((friend) =>
+        friend.id === selectedFriend.id
+          ? { ...friend, balance: friend.balance + value }
+          : friend
+      )
+    );
+    // to clear the form after spliting the bill;this will also close it
+    setSelectedFriend(null);
+  }
   return (
     <div classname="app">
       <div classname="sidebar">
@@ -78,7 +91,12 @@ export default function App() {
       {/*2. when no friend is selected, we dont want this form to show up
       we created a state now we use it by conditionally rendering the splitBillForm*/}
       {/*in order to pass the name of the selected friend into the splitBillForm wher e it is marked x,pass it on FormSplitBill*/}
-      {selectedFriend && <FormSplitBill selectedFriend={selectedFriend} />}
+      {selectedFriend && (
+        <FormSplitBill
+          selectedFriend={selectedFriend}
+          onSplitBill={handleSplitBill}
+        />
+      )}
     </div>
   );
 }
@@ -188,7 +206,7 @@ function FormAddFriend({ onAddFriend }) {
     </form>
   );
 }
-function FormSplitBill({ selectedFriend }) {
+function FormSplitBill({ selectedFriend, onSplitBill }) {
   //controlled element
   //using "" because these are input field
   const [bill, setBill] = useState("");
@@ -197,9 +215,15 @@ function FormSplitBill({ selectedFriend }) {
   //if there is a bill the result is bill-paidByUser, else "";
   const paidByFriend = bill ? bill - paidByUser : "";
   const [whoIsPaying, setWhoIsPaying] = useState("user");
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!bill || !paidByUser) return;
+    onSplitBill(whoIsPaying === "user" ? paidByFriend : -paidByUser);
+  }
 
   return (
-    <form classname="form-split-bill">
+    //now all we have to do is listen the controlled state and submit the form using handle submit function
+    <form classname="form-split-bill" onSubmit={handleSubmit}>
       <h2>Split bill with {selectedFriend.name}</h2>
       <label>💰 Bill value</label>
       <input
